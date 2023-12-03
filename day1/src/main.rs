@@ -33,13 +33,11 @@ fn main() -> std::io::Result<()> {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
-        eprintln!("Usage: my_program <file_name>");
+        eprintln!("Usage: cargo run <file_name>");
         std::process::exit(1);
     }
 
     let file_name = &args[1];
-    println!("The file name is: {}", file_name);
-
     let bindings = read_file(file_name.to_string())?;
     let contents: Vec<&str> = bindings.lines().collect();
     let sum = calib_sum_value(contents);

@@ -1,3 +1,5 @@
+# Advent of code day 1
+
 The newly-improved calibration document consists of lines of text; each line originally contained a specific calibration value that the Elves now need to recover. On each line, the calibration value can be found by combining the first digit and the last digit (in that order) to form a single two-digit number.
 
 For example:
@@ -13,3 +15,11 @@ In this example, the calibration values of these four lines are 12, 38, 15, and 
 
 Consider your entire calibration document. What is the sum of all of the calibration values?
 
+
+
+## run code
+
+```bash
+cargo run calibration_doc.txt
+>>> Calibration sum is: 55816
+```
