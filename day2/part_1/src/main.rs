@@ -1,10 +1,44 @@
+use core::panic;
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
 
-fn check_game(_input: &str) -> bool {
-    // input example "1 green, 4 blue;"
-    true
+fn check_part(part: &str) -> Result<bool, String> {
+    // input example "1 green, 4 blue"
+    for sub_part in part.split(",") {
+        // sub_part: " 1 green"
+        let sub_part = &sub_part[1..];
+        // sub_part: "1 green"
+
+        let splits: Vec<_> = sub_part.split(" ").collect();
+
+        let num = splits[0].parse::<usize>().unwrap();
+        let color = splits[1];
+
+        let valid = match color {
+            "red" => num <= 12,
+            "green" => num <= 13,
+            "blue" => num <= 14,
+            _ => return Err(format!("color is not valid {color}")),
+        };
+
+        if !valid {
+            return Ok(false);
+        }
+    }
+
+    return Ok(true);
+}
+
+fn check_game(input: &str) -> bool {
+    // input example " 1 green, 4 blue; 1 blue, 2 green, 1 red;"
+    for part in input.split(";") {
+        if !check_part(part).unwrap() {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 fn get_game_id(input: &str) -> Result<usize, String> {
@@ -27,7 +61,7 @@ fn get_game_id(input: &str) -> Result<usize, String> {
 }
 
 fn game_value<'a>(input: &'a str) -> usize {
-    // input example "Game 1: 1 green, 4 blue;"
+    // input example "Game 1: 1 green, 4 blue; 1 blue, 2 green, 1 red;"
 
     for (i, c) in input.chars().enumerate() {
         if c == ':' {
