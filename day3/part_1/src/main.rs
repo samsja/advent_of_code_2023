@@ -6,6 +6,10 @@ fn is_special(c: char) -> bool {
     return !(c.is_ascii_digit() || c == '.');
 }
 
+fn get_expanded_line(line: &str) -> Vec<char> {
+    ".".chars().chain(line.chars()).chain(".".chars()).collect()
+}
+
 fn val_trio(top: &str, mid: &str, bottom: &str) -> usize {
     /*
     input like
@@ -14,35 +18,44 @@ fn val_trio(top: &str, mid: &str, bottom: &str) -> usize {
     ..35..633.
      */
 
-    let mid: Vec<char> = mid.chars().collect();
-    let top: Vec<char> = top.chars().collect();
-    let bottom: Vec<char> = bottom.chars().collect();
+    // println!("{mid}");
+
+    let top: Vec<char> = get_expanded_line(top);
+    let mid: Vec<char> = get_expanded_line(mid);
+    let bottom: Vec<char> = get_expanded_line(bottom);
 
     let mut sum: usize = 0;
 
     let mut current_num: String = String::from("");
 
-    let mut special_carac_around = false;
+    let mut special_carac_before = false;
+    let mut special_carac_this_line = false;
 
     for (i, &c) in mid.iter().enumerate() {
-        special_carac_around =
-            special_carac_around || is_special(c) || is_special(top[i]) || is_special(bottom[i]);
-
-        print!("{special_carac_around} ");
+        if i == mid.len() - 1 {
+            break;
+        }
+        let special_carac_next_line =
+            is_special(mid[i + 1]) || is_special(top[i + 1]) || is_special(bottom[i + 1]);
+        let special_carac_around: bool =
+            special_carac_before || special_carac_this_line || special_carac_next_line;
         if c.is_ascii_digit() {
             current_num.push(c);
+            special_carac_before = special_carac_around;
         } else {
             if current_num.len() > 0 {
                 if special_carac_around {
                     let s = current_num.parse::<usize>().unwrap();
-                    print!("{s} \n");
+                    // print!("{s} \n");
                     sum += s;
                 }
-
-                special_carac_around = false;
                 current_num.clear();
             }
+
+            special_carac_before = special_carac_this_line;
         }
+
+        special_carac_this_line = special_carac_next_line;
     }
 
     sum
