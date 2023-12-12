@@ -7,9 +7,8 @@ fn is_special(c: char) -> bool {
 }
 
 fn get_expanded_line(line: &str) -> Vec<char> {
-    ".".chars().chain(line.chars()).chain(".".chars()).collect()
+    line.chars().chain(".".chars()).collect()
 }
-
 fn val_trio(top: &str, mid: &str, bottom: &str) -> usize {
     /*
     input like
@@ -27,24 +26,19 @@ fn val_trio(top: &str, mid: &str, bottom: &str) -> usize {
     let mut sum: usize = 0;
 
     let mut current_num: String = String::from("");
-
     let mut special_carac_before = false;
-    let mut special_carac_this_line = false;
+
+    let mut special_carac_this_line: bool;
 
     for (i, &c) in mid.iter().enumerate() {
-        if i == mid.len() - 1 {
-            break;
-        }
-        let special_carac_next_line =
-            is_special(mid[i + 1]) || is_special(top[i + 1]) || is_special(bottom[i + 1]);
-        let special_carac_around: bool =
-            special_carac_before || special_carac_this_line || special_carac_next_line;
+        special_carac_this_line = is_special(bottom[i]) || is_special(mid[i]) || is_special(top[i]);
+
         if c.is_ascii_digit() {
             current_num.push(c);
-            special_carac_before = special_carac_around;
+            special_carac_before = special_carac_before || special_carac_this_line;
         } else {
-            if current_num.len() > 0 {
-                if special_carac_around {
+            if !current_num.is_empty() {
+                if special_carac_before || special_carac_this_line {
                     let s = current_num.parse::<usize>().unwrap();
                     // print!("{s} \n");
                     sum += s;
@@ -52,10 +46,8 @@ fn val_trio(top: &str, mid: &str, bottom: &str) -> usize {
                 current_num.clear();
             }
 
-            special_carac_before = special_carac_this_line;
+            special_carac_before = special_carac_this_line
         }
-
-        special_carac_this_line = special_carac_next_line;
     }
 
     sum
