@@ -7,8 +7,47 @@ fn is_special(c: char) -> bool {
 }
 
 fn get_expanded_line(line: &str) -> Vec<char> {
-    line.chars().chain(".".chars()).collect()
+    ".".chars().chain(line.chars()).chain(".".chars()).collect()
 }
+fn find_num_and_push_it(nums: &mut Vec<usize>, line: &Vec<char>, i: usize) {
+    let mut num_left = String::from("");
+
+    let mut j = i - 1;
+    let mut c: char = line[j];
+    while c.is_ascii_digit() {
+        num_left.push(c);
+        j -= 1;
+        c = line[j];
+    }
+
+    num_left = num_left.chars().rev().collect();
+
+    let mut num_right = String::from("");
+
+    let mut j = i + 1;
+
+    c = line[j];
+    while c.is_ascii_digit() {
+        num_right.push(c);
+        j += 1;
+        c = line[j];
+    }
+
+    c = line[i];
+    if c.is_ascii_digit() {
+        let final_num = format!("{num_left}{c}{num_right}");
+        nums.push(final_num.parse::<usize>().unwrap())
+    } else {
+        if !num_left.is_empty() {
+            nums.push(num_left.parse::<usize>().unwrap())
+        }
+
+        if !num_right.is_empty() {
+            nums.push(num_right.parse::<usize>().unwrap())
+        }
+    }
+}
+
 fn val_trio(top: &str, mid: &str, bottom: &str) -> usize {
     /*
     input like
@@ -25,28 +64,18 @@ fn val_trio(top: &str, mid: &str, bottom: &str) -> usize {
 
     let mut sum: usize = 0;
 
-    let mut current_num: String = String::from("");
-    let mut special_carac_before = false;
+    for i in 1..(mid.len() - 1) {
+        if is_special(mid[i]) {
+            let mut nums: Vec<usize> = vec![];
 
-    let mut special_carac_this_line: bool;
+            find_num_and_push_it(&mut nums, &mid, i);
+            find_num_and_push_it(&mut nums, &top, i);
+            find_num_and_push_it(&mut nums, &bottom, i);
 
-    for (i, &c) in mid.iter().enumerate() {
-        special_carac_this_line = is_special(bottom[i]) || is_special(mid[i]) || is_special(top[i]);
-
-        if c.is_ascii_digit() {
-            current_num.push(c);
-            special_carac_before = special_carac_before || special_carac_this_line;
-        } else {
-            if !current_num.is_empty() {
-                if special_carac_before || special_carac_this_line {
-                    let s = current_num.parse::<usize>().unwrap();
-                    // print!("{s} \n");
-                    sum += s;
-                }
-                current_num.clear();
+            if nums.len() == 2 {
+                sum += nums[0] * nums[1];
+                // println!("{} {} {}",mid[i], nums[0], nums[1]);
             }
-
-            special_carac_before = special_carac_this_line
         }
     }
 
